@@ -7,191 +7,100 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.Test;
 
-import Utility.ConfigValues;
+import Utility.StepUtils;
 
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.Date;
 
 public class Charter {
+	
+	//static String ModuleName = "Charter";
+    private static WebDriverWait getWait(WebDriver driver) {
+        return new WebDriverWait(driver, Duration.ofSeconds(20));
+    }
+    
 
-	static String ModuleName = "Charter";
+    private static void waitForLoaderToDisappear(WebDriver driver) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("div[data-testid='loading']")));
+    }
 
-	// Utility method to create WebDriverWait
-	private static WebDriverWait getWait(WebDriver driver) {
-		return new WebDriverWait(driver, Duration.ofSeconds(20));
-	}
+    @Test
+    public static void TopicCreation(WebDriver driver) throws Exception {
+    	
+    	StepUtils.moduleName = "Charter";   // Set module name once per test
 
-	// 🔁 Reusable method to wait for any loading overlay to disappear
-	private static void waitForLoaderToDisappear(WebDriver driver) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-		wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("div[data-testid='loading']")));
-	}
-@Test
+        WebDriverWait wait = getWait(driver);
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        Actions actions = new Actions(driver);
 
-	public static void TopicCreation(WebDriver driver) throws InterruptedException {
+        StepUtils.runStep(driver, "<b>Charter_Click</b> - Click Charter menu", "Charter button not clicked",
+            () -> wait.until(ExpectedConditions.elementToBeClickable(By.id("Charter"))).click());
 
-		WebDriverWait wait = getWait(driver);
-		JavascriptExecutor js = (JavascriptExecutor) driver;
-		Actions actions = new Actions(driver);
-		try {
+        StepUtils.runStep(driver, "<b>Charter_Add</b> - Click Add icon", "Add icon not clickable",
+            () -> wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//div[@class='MuiBox-root css-1x66lww']//button[@id='add__icon']"))).click());
 
-			ConfigValues.TestCase = "<b>Charter_Click</b> - Verify the click on Charter text";
-			ConfigValues.TestStartTime = getCurrentTimestamp();
-			wait.until(ExpectedConditions.elementToBeClickable(By.id("Charter"))).click();
-			ConfigValues.TestEndTime = getCurrentTimestamp();
-		} catch (Exception e) {
-			ConfigValues.takeScreenshot(driver, ModuleName);
-		} finally {
-			if (ConfigValues.TestEndTime == "") {
-				ConfigValues.FailuerReason = "Charter button not clicked";
-			}
-			recordTestCase();
-		}
+        StepUtils.runStep(driver, "<b>Charter_EventType</b> - Select Event Type: Market Research",
+            "Event type dropdown or Market Research option failed", () -> {
+                wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//div[@id='select__event__type'])[2]"))).click();
+                WebElement type = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//li[normalize-space(text())='Market Research']")));
+                js.executeScript("arguments[0].value='Market Research'", type);
+                type.click();
+            });
 
-		try {
-			ConfigValues.TestCase = "<b>Charter_Fill</b> - Verify the submission of Request_Unlock";
-			ConfigValues.TestStartTime = getCurrentTimestamp();
-			// Wait and click 'add__icon' button
-			wait.until(ExpectedConditions
-					.elementToBeClickable(By.xpath("//div[@class='MuiBox-root css-1x66lww']//button[@id='add__icon']")))
-					.click();
-			ConfigValues.TestEndTime = getCurrentTimestamp();
+        StepUtils.runStep(driver, "<b>Charter_Topic</b> - Enter Topic Name", "Unable to enter topic name", () -> {
+            WebElement topicArea = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("(//textarea[@id='charter_text_area'])[2]")));
+            topicArea.sendKeys(Constants.TopicName);
+        });
 
-			System.out.println("pass");
-			// Select Event Type dropdown
-			wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//div[@id='select__event__type'])[2]")))
-					.click();
+        StepUtils.runStep(driver, "<b>Charter_HCP</b> - Enter HCP Number", "Unable to enter HCP number", () -> {
+            WebElement hcpNumber = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("(//input[@id='hcp_number'])[2]")));
+            hcpNumber.sendKeys("10");
+        });
 
-			// Select 'Market Research' option
-			WebElement type = wait.until(ExpectedConditions
-					.elementToBeClickable(By.xpath("//li[normalize-space(text())='Market Research']")));
-			js.executeScript("arguments[0].value='Market Research'", type);
-			type.click();
+        StepUtils.runStep(driver, "<b>Charter_Division</b> - Select Division: Mankind", "Unable to select Division Mankind",
+            () -> {
+                wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//div[@id='select__division'])[2]"))).click();
+                WebElement divi = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("(//span[normalize-space()='mankind'])[1]")));
+                js.executeScript("arguments[0].value='mankind'", divi);
+                divi.click();
+                Thread.sleep(2000);
+                waitForLoaderToDisappear(driver);
+            });
 
-			// Enter Topic name
-			WebElement topicArea = wait.until(ExpectedConditions
-					.visibilityOfElementLocated(By.xpath("(//textarea[@id='charter_text_area'])[2]")));
-			topicArea.sendKeys(Constants.TopicName);
+        StepUtils.runStep(driver, "<b>Charter_Specialty</b> - Select Specialty: All", "Unable to select Specialty All", () -> {
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//div[@id='select__specialities'])[2]"))).click();
+            waitForLoaderToDisappear(driver);
+            WebElement spec = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//span[normalize-space()='All']")));
+            js.executeScript("arguments[0].value='All'", spec);
+            spec.click();
+        });
 
-			// Enter HCP number
-			WebElement hcpNumber = wait
-					.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//input[@id='hcp_number'])[2]")));
-			hcpNumber.sendKeys("10");
+        StepUtils.runStep(driver, "<b>Charter_Save</b> - Click Save button twice", "Unable to save topic form", () -> {
+            WebElement button = driver.findElement(By.xpath("(//button[@id='save_btn'])"));
+            actions.click(button).perform();
+            Thread.sleep(2000);
+            actions.click(button).perform();
+            Thread.sleep(3000);
+        });
+    }
 
-			// Select Division dropdown
-			wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//div[@id='select__division'])[2]"))).click();
+    @Test
+    public static void TopicSubmit(WebDriver driver) throws Exception {
+    	StepUtils.moduleName = "Charter"; 
 
-			// Select 'mankind' division
-			WebElement divi = wait.until(
-					ExpectedConditions.elementToBeClickable(By.xpath("(//span[normalize-space()='mankind'])[1]")));
-			js.executeScript("arguments[0].value='mankind'", divi);
-			divi.click();
-			Thread.sleep(3000);
-			waitForLoaderToDisappear(driver);
-
-			// Select Specialty dropdown
-			wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//div[@id='select__specialities'])[2]")))
-					.click();
-
-			waitForLoaderToDisappear(driver);
-			// Select 'All' specialty
-			WebElement spec = wait
-					.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[normalize-space()='All']")));
-			js.executeScript("arguments[0].value='All'", spec);
-			spec.click();
-
-			Thread.sleep(1000);
-			WebElement button = driver.findElement(By.xpath("(//button[@id='save_btn'])"));
-
-			// Create an Actions object
-			// Perform a click action
-			actions.click(button).perform();
-			Thread.sleep(2000);
-			actions.click(button).perform();
-			Thread.sleep(3000);
-		} catch (Exception e) {
-			ConfigValues.takeScreenshot(driver, ModuleName);
-		} finally {
-			if (ConfigValues.TestEndTime == "") {
-				ConfigValues.FailuerReason = "Unable to create the topic while fetching data.";
-			}
-			recordTestCase();
-		}
-
-//		actions.sendKeys(Keys.TAB ).perform();
-//		Thread.sleep(2000);
-//        // Find Save button
-//		wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".MuiBackdrop-root")));
-//		WebElement saveButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("save_btn")));
-//		saveButton.click();
-//
-//		wait.until(ExpectedConditions.elementToBeClickable(By.id("save_btn"))).click();
-//        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[@id='save_btn'])"))).click();
-//        WebElement button1 = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[@id='save_btn'])")));
-//
-//        // Click Save button twice using Actions
-//        actions.click(button).perform();
-//        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[@id='save_btn'])")));  // Wait for any possible processing
-//        actions.click(button).perform();
-	}
-@Test
-	public static void TopicSubmit(WebDriver driver) throws InterruptedException {
-		try {
-			ConfigValues.TestCase = "<b>Charter_Submit</b> - Verify Submit for Approval button";
-			ConfigValues.TestStartTime = getCurrentTimestamp();
-			Thread.sleep(2000);
-			driver.findElement(By.xpath("(//input[@id='topic__checkbox'])[2]")).click();
-			Thread.sleep(2000);
-			driver.findElement(By.xpath("(//button[normalize-space()='Submit for Approval'])[1]")).click();
-			Thread.sleep(3000);
-			ConfigValues.TestEndTime = getCurrentTimestamp();
-		} catch (Exception e) {
-			ConfigValues.takeScreenshot(driver, ModuleName);
-		} finally {
-			if (ConfigValues.TestEndTime == "") {
-				ConfigValues.FailuerReason = "Issue with checkbox related to created topic. ";
-			}
-			recordTestCase();
-		}
-
-	}
-
-	private static String getCurrentTimestamp() {
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-	}
-
-	private static void recordTestCase() {
-		// ConfigValues.TestEndTime = getCurrentTimestamp();
-		ConfigValues.generator.addTestCaseRow(ModuleName, ConfigValues.TestCase, ConfigValues.TestStartTime,
-				ConfigValues.TestEndTime, ConfigValues.FailuerReason);
-		ConfigValues.TestCase = "";
-		ConfigValues.TestStartTime = "";
-		ConfigValues.TestEndTime = "";
-		ConfigValues.FailuerReason = "";
-
-	}
-
-//    public static void TopicSubmit(WebDriver driver) throws InterruptedException {
-//        
-//    	Thread.sleep(2000);
-//    	
-//    	WebDriverWait wait = getWait(driver);
-//        try {
-//            // First attempt
-//            System.out.println("First attempt: trying to click the checkbox...");
-//            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//input[@id='topic__checkbox'])[2]"))).click();
-//            System.out.println("Checkbox clicked successfully on first attempt!");
-//        } catch (Exception e) {
-//            System.out.println("First attempt failed: " + e.getMessage());
-//            System.out.println("Retrying after 5 seconds...");
-//            Thread.sleep(5000);
-//
-//            // Retry once after wait
-//            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//input[@id='topic__checkbox'])[2]"))).click();
-//            System.out.println("Checkbox clicked successfully on retry!");
-//            
-//        // Click 'Submit for Approval' button
-//        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[normalize-space()='Submit for Approval'])[1]"))).click();
-
+        StepUtils.runStep(driver, "<b>Charter_Submit</b> - Submit created topic for approval",
+            "Issue with checkbox or Submit for Approval button", () -> {
+                Thread.sleep(2000);
+                driver.findElement(By.xpath("(//input[@id='topic__checkbox'])[2]")).click();
+                Thread.sleep(2000);
+                driver.findElement(By.xpath("(//button[normalize-space()='Submit for Approval'])[1]")).click();
+                Thread.sleep(3000);
+            });
+    }
 }

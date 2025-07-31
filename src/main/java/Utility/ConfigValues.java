@@ -19,7 +19,9 @@ public class ConfigValues {
 	public static String TestCase = "";
 	public static String TestStartTime = "";
 	public static String TestEndTime = "";
-	public static String FailuerReason = "";
+	public static String FailureReason = "";
+	
+	public String moduleName = "";
 	
 	public static Map<String, String> failedTestScreenshots = new HashMap<>();
 	

@@ -8,6 +8,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 public class Main {
 
 	public static void main(String[] args) throws InterruptedException {
+		 WebDriver driver = null;
 		try {
 
 			// Load the properties file (adjust path as needed)
@@ -24,7 +25,7 @@ public class Main {
 			options.addArguments("--incognito");
 
 			// Launch Chrome with options
-			WebDriver driver = new ChromeDriver(options);
+			 driver = new ChromeDriver(options);
 
 			// Get base URL and user credentials based on environment
 			String baseUrl = ConfigReader.get(env + ".url");
@@ -75,7 +76,7 @@ public class Main {
 				System.out.println("Logout has failed");
 			}
 
-			// Logging in with Charter Reviewer
+			 //Logging in with Charter Reviewer
 			try {
 				LoginLogout.Login(driver, reviewerUsername, reviewerPassword);
 			} catch (Exception e) {
@@ -277,8 +278,13 @@ public class Main {
 				System.out.println("Payment Acknowledgement has  failed");
 			}
 		} catch (Exception e) {
-
+			System.out.println("Unexpected error: " + e.getMessage());
 		} finally {
+			// Close the browser
+            if (driver != null) {
+                driver.quit();
+            }
+         // Finalize report 
 			ConfigValues.generator.finalizeReport("C:\\WorkspaceAMS_Himanshu\\AMS\\test-output");
 		}
 
