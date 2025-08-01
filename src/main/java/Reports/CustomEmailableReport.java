@@ -121,9 +121,9 @@ public class CustomEmailableReport implements IReporter {
 
         report.append("<html><head><title>Test Report</title>");
         report.append("<script src='https://cdn.jsdelivr.net/npm/chart.js'></script></head><body>");
-        report.append("<h1 style=\"background-color:#D3D3D3; color:Black\">SUPERMAN TEST RESULT</h1>");
+        report.append("<h1 style=\"background-color:#D3D3D3; color:Black\">AMS TEST RESULT</h1>");
         report.append("<p>Hi</p>");
-        report.append("<p>Below is the Automation Testing Report of Superman smoke test result on the latest Build.</p>");
+        report.append("<p>Below is the Automation Testing Report of AMS smoke test result on the latest Build.</p>");
         report.append("<p>Report generated on: ").append(currentDate).append("</p>");
     }
 

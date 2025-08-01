@@ -109,9 +109,16 @@ public class Main {
 			// Creation of Event
 			try {
 				Event.EventCreation(driver);
-				LoginLogout.LogoutwithSearch(driver);
-			} catch (Exception e) {
+			}catch (Exception e) 
+			{
 				System.out.println("Event creation has failed");
+			}
+			//Logout from Initiator
+			try {
+				LoginLogout.LogoutwithSearch(driver);
+			}catch (Exception e) 
+			{
+				System.out.println("Initiator Logout has failed");
 			}
 			// Logging in with Charter Reviewer
 			try {

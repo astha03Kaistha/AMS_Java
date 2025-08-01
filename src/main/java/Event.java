@@ -5,107 +5,182 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import Utility.StepUtils;
+
 import java.time.Duration;
 
 public class Event {
 
-	// 🔁 Reusable method to wait for any loading overlay to disappear
-    private static void waitForLoaderToDisappear(WebDriver driver) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(
-            By.cssSelector("div[data-testid='loading']")));
-    }
-    
-    public static void EventCreation(WebDriver driver) throws InterruptedException {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        Actions actions = new Actions(driver);
+	private static WebDriverWait getWait(WebDriver driver) {
+		return new WebDriverWait(driver, Duration.ofSeconds(20));
+	}
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'New Events')]"))).click();
+	private static void waitForLoaderToDisappear(WebDriver driver) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+		wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("div[data-testid='loading']")));
+	}
 
-        Thread.sleep(1000);
-        WebElement topicInput = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[contains(@class, 'MuiInputBase-input') and contains(@class, 'MuiOutlinedInput-input')]")));
-        topicInput.click();
-        topicInput.sendKeys(Constants.TopicName);
+	public static void EventCreation(WebDriver driver) throws Exception {
+		StepUtils.moduleName = "Event";
+		WebDriverWait wait = getWait(driver);
+		Actions actions = new Actions(driver);
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[normalize-space()='Apply'])[1]"))).click();
+		StepUtils.runStep(driver, "<b>Event_NewEvents</b> - Click New Events tab", "Unable to click New Events tab",
+				() -> wait.until(
+						ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'New Events')]")))
+						.click());
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[normalize-space()='Add HCP'])[1]"))).click();
+		StepUtils.runStep(driver, "<b>Event_TopicInput</b> - Search By Topic Name", "Unable to search topic name",
+				() -> {
+					Thread.sleep(1000);
+					WebElement topicInput = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(
+							"//input[contains(@class, 'MuiInputBase-input') and contains(@class, 'MuiOutlinedInput-input')]")));
+					topicInput.click();
+					topicInput.sendKeys(Constants.TopicName);
+				});
 
-        WebElement hcpInput = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//input[@id='hcp'])[1]")));
-        hcpInput.click();
-        hcpInput.sendKeys("295075");
+		StepUtils.runStep(driver, "<b>Event_ApplyFilter</b> - Click Apply button", "Unable to click Apply button",
+				() -> wait.until(
+						ExpectedConditions.elementToBeClickable(By.xpath("(//button[normalize-space()='Apply'])[1]")))
+						.click());
 
-        // Wait until dropdown option appears and click
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("hcp-option-0"))).click();
+		StepUtils.runStep(driver, "<b>Event_AddHCP</b> - Click Add HCP button", "Unable to click Add HCP button",
+				() -> wait.until(
+						ExpectedConditions.elementToBeClickable(By.xpath("(//button[normalize-space()='Add HCP'])[1]")))
+						.click());
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.name("tentativeDate"))).click();
-        Thread.sleep(1000);
-		driver.findElement(By.xpath("(//span[@class='rdrDayNumber'])[31]")).click();
-//        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//span[@class='rdrDayNumber'])[33]"))).click();
+		StepUtils.runStep(driver, "<b>Event_HCPInput</b> - Enter HCP Number", "Unable to enter HCP number", () -> {
+			WebElement hcpInput = wait
+					.until(ExpectedConditions.elementToBeClickable(By.xpath("(//input[@id='hcp'])[1]")));
+			hcpInput.click();
+			hcpInput.sendKeys("295075");
+			wait.until(ExpectedConditions.elementToBeClickable(By.id("hcp-option-0"))).click();
+		});
 
-        WebElement honorariumInput = wait.until(ExpectedConditions.elementToBeClickable(By.name("honorarium")));
-        honorariumInput.click();
-        honorariumInput.sendKeys("323");
+		StepUtils.runStep(driver, "<b>Event_SelectTentativeDate</b> - Select Tentative Date",
+				"Unable to select tentative date", () -> {
+					wait.until(ExpectedConditions.elementToBeClickable(By.name("tentativeDate"))).click();
+					Thread.sleep(1000);
+					driver.findElement(By.xpath("//button[@class='rdrNextPrevButton rdrNextButton']")).click();
+					driver.findElement(By.xpath("(//span[@class='rdrDayNumber'])[15]")).click();
+				});
 
-        actions.sendKeys(Keys.PAGE_DOWN).perform();
+		StepUtils.runStep(driver, "<b>Event_HonorariumInput</b> - Enter Honorarium Amount",
+				"Unable to enter honorarium", () -> {
+					WebElement honorariumInput = wait
+							.until(ExpectedConditions.elementToBeClickable(By.name("honorarium")));
+					honorariumInput.click();
+					honorariumInput.sendKeys("323");
+				});
+		StepUtils.runStep(driver,
+				"<b>Event_AddHCPWithScrollAndLoader</b> - Scroll, wait for loader, click Add HCP and wait again",
+				"Unable to complete combined Add HCP flow", () -> {
+					actions.sendKeys(Keys.PAGE_DOWN).perform();
+					waitForLoaderToDisappear(driver);
+					wait.until(
+							ExpectedConditions.elementToBeClickable(By.xpath("//button[normalize-space()='Add HCP']")))
+							.click();
+					waitForLoaderToDisappear(driver);
+				});
 
-        waitForLoaderToDisappear(driver);
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[normalize-space()='Add HCP']"))).click();
-        waitForLoaderToDisappear(driver);
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[normalize-space()='Submit for Approval']"))).click();
+		StepUtils
+				.runStep(driver, "<b>Event_SubmitForApproval</b> - Click Submit for Approval",
+						"Unable to submit for approval",
+						() -> wait.until(ExpectedConditions
+								.elementToBeClickable(By.xpath("//button[normalize-space()='Submit for Approval']")))
+								.click());
 
-        actions.sendKeys(Keys.TAB).perform();
-        actions.sendKeys(Keys.TAB).perform();
-        actions.sendKeys(Keys.ENTER).perform();
-        Thread.sleep(1000);
-    }
+		StepUtils.runStep(driver, "<b>Event_ConfirmSubmission</b> - Confirm submission popup",
+				"Unable to confirm submission", () -> {
+					actions.sendKeys(Keys.TAB).perform();
+					actions.sendKeys(Keys.TAB).perform();
+					actions.sendKeys(Keys.ENTER).perform();
+					Thread.sleep(1000);
+				});
+	}
 
-    public static void EventSearch(WebDriver driver) throws InterruptedException {
-    	
-    	Thread.sleep(2000);
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        Actions actions = new Actions(driver);
+	public static void EventSearch(WebDriver driver) throws Exception {
+		StepUtils.moduleName = "Event";
+		WebDriverWait wait = getWait(driver);
+		Actions actions = new Actions(driver);
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@id='mui-component-select-searchByHcp']"))).click();
-        actions.sendKeys(Keys.ARROW_UP).perform();
-        actions.sendKeys(Keys.ENTER).perform();
-        actions.sendKeys(Keys.TAB).perform();
-        actions.sendKeys(Constants.TopicName).perform();
-        Thread.sleep(2000);
-        actions.sendKeys(Keys.ENTER).perform();
-        
-    }
+		StepUtils.runStep(driver, "<b>Event_clickSearchByFilterDropdown</b> - Open search filter dropdown and select option",
+			    "Unable to open and select search filter option",
+			    () -> {
+			        wait.until(ExpectedConditions
+			            .elementToBeClickable(By.xpath("//div[@id='mui-component-select-searchByHcp']"))).click();
+			        actions.sendKeys(Keys.ARROW_UP).perform();
+			        actions.sendKeys(Keys.ENTER).perform();
+			    });
 
-    public static void EventApproval(WebDriver driver) throws InterruptedException {
-        Actions actions = new Actions(driver);
-        Thread.sleep(1000);
-        driver.findElement(By.partialLinkText("M/MAN/25-26/")).click();
-        actions.sendKeys(Keys.PAGE_DOWN).perform();
-        Thread.sleep(1000);
-        driver.findElement(By.xpath("//button[normalize-space()='Approve']")).click();
-        Thread.sleep(2000);
-    }
 
-    public static void EventClaim(WebDriver driver) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        Actions actions = new Actions(driver);
+		StepUtils.runStep(driver, "<b>Event_SearchByTopic</b> - Enter search term", "Unable to enter search term",
+				() -> {
+					actions.sendKeys(Keys.TAB).perform();
+					//need to implement apply instead of enter perform - pending task
+					actions.sendKeys(Constants.TopicName).perform();
+					Thread.sleep(2000);
+					actions.sendKeys(Keys.ENTER).perform();
+				});
+	}
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[text()='Claim']"))).click();
+	public static void EventApproval(WebDriver driver) throws Exception {
+		StepUtils.moduleName = "Event";
+		Actions actions = new Actions(driver);
 
-        actions.sendKeys(Keys.TAB).perform();
-        actions.sendKeys(Keys.TAB).perform();
-        actions.sendKeys(Keys.ENTER).perform();
-    }
+		StepUtils.runStep(driver, "<b>Event_OpenApprovalLink</b> - Click approval link",
+				"Unable to click approval link", () -> driver.findElement(By.partialLinkText("M/MAN/25-26/")).click());
 
-    public static void Filter(WebDriver driver) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        Actions actions = new Actions(driver);
+		StepUtils.runStep(driver, "<b>Event_ApproveEvent</b> - Scroll, click Approve and wait",
+			    "Failed to approve event after scrolling",
+			    () -> {
+			        actions.sendKeys(Keys.PAGE_DOWN).perform();
+			        driver.findElement(By.xpath("//button[normalize-space()='Approve']")).click();
+			        Thread.sleep(2000);
+			    });
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@id='mui-component-select-status']"))).click();
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[normalize-space()='All']"))).click();
+	}
 
-        actions.sendKeys(Keys.ESCAPE).perform();
+	public static void EventClaim(WebDriver driver) throws Exception {
+		StepUtils.moduleName = "Event";
+		WebDriverWait wait = getWait(driver);
+		Actions actions = new Actions(driver);
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[normalize-space()='Apply']"))).click();
-    }
+		StepUtils.runStep(driver, "<b>Event_ClickClaim</b> - Click Claim button", "Unable to click Claim button",
+				() -> wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[text()='Claim']")))
+						.click());
+
+		StepUtils.runStep(driver, "<b>Event_ConfirmClaim</b> - Confirm claim via keyboard", "Unable to confirm claim",
+				() -> {
+					actions.sendKeys(Keys.TAB).perform();
+					actions.sendKeys(Keys.TAB).perform();
+					actions.sendKeys(Keys.ENTER).perform();
+				});
+	}
+
+	public static void Filter(WebDriver driver) throws Exception {
+		StepUtils.moduleName = "Event";
+		WebDriverWait wait = getWait(driver);
+		Actions actions = new Actions(driver);
+
+		StepUtils.runStep(driver, "<b>Filter_OpenStatusMenuDropdown</b> - Open status dropdown",
+				"Unable to open status dropdown",
+				() -> wait.until(
+						ExpectedConditions.elementToBeClickable(By.xpath("//div[@id='mui-component-select-status']")))
+						.click());
+
+		StepUtils.runStep(driver, "<b>Filter_SelectAllAndClose</b> - Select 'All' status and close dropdown",
+			    "Unable to select 'All' status and close dropdown",
+			    () -> {
+			        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[normalize-space()='All']"))).click();
+			        actions.sendKeys(Keys.ESCAPE).perform();
+			    });
+
+
+		StepUtils.runStep(driver, "<b>Filter_ApplyFilters</b> - Click Apply button", "Unable to click Apply button",
+				() -> wait
+						.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[normalize-space()='Apply']")))
+						.click());
+	}
 }

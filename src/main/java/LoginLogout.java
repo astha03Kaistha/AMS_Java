@@ -12,11 +12,12 @@ import java.time.Duration;
 
 public class LoginLogout {
 
-    static String ModuleName = "LoginLogout";
+    //static String ModuleName = "LoginLogout";
 
     @Test
     public static void PageLaunch(WebDriver driver, String url) {
-    	StepUtils.moduleName = ModuleName; 
+    	StepUtils.moduleName = "LoginLogout";
+    	 
 
         StepUtils.runStep(driver, "<b>PageLaunch</b> - Verify page launch", "Page did not launch successfully", () -> {
             Thread.sleep(2000);
@@ -35,7 +36,7 @@ public class LoginLogout {
     @Test
     public static void Login(WebDriver driver, String userId, String password) {
     	
-    	StepUtils.moduleName = ModuleName; 
+    	StepUtils.moduleName = "LoginLogout"; 
 
         StepUtils.runStep(driver, "<b>Login</b> - Verify the Login", "Login button not clicked or login failed", () -> {
             Thread.sleep(3000);
@@ -52,7 +53,7 @@ public class LoginLogout {
 
     @Test
     public static void LogoutwithSearch(WebDriver driver) {
-    	StepUtils.moduleName = ModuleName; 
+    	StepUtils.moduleName = "LoginLogout"; 
 
         StepUtils.runStep(driver, "<b>Logout</b> - Verify the Logout", "Logout failed", () -> {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));

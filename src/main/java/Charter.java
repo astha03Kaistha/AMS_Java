@@ -81,7 +81,7 @@ public class Charter {
             spec.click();
         });
 
-        StepUtils.runStep(driver, "<b>Charter_Save</b> - Click Save button twice", "Unable to save topic form", () -> {
+        StepUtils.runStep(driver, "<b>Charter_Save</b> - Click Save button", "Unable to save topic form", () -> {
             WebElement button = driver.findElement(By.xpath("(//button[@id='save_btn'])"));
             actions.click(button).perform();
             Thread.sleep(2000);
@@ -94,7 +94,7 @@ public class Charter {
     public static void TopicSubmit(WebDriver driver) throws Exception {
     	StepUtils.moduleName = "Charter"; 
 
-        StepUtils.runStep(driver, "<b>Charter_Submit</b> - Submit created topic for approval",
+        StepUtils.runStep(driver, "<b>Charter_Submit</b> - Sending Topic for Approval",
             "Issue with checkbox or Submit for Approval button", () -> {
                 Thread.sleep(2000);
                 driver.findElement(By.xpath("(//input[@id='topic__checkbox'])[2]")).click();
